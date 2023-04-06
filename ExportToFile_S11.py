@@ -1,0 +1,6 @@
+oDesktop.RestoreWindow()
+oProject = oDesktop.SetActiveProject("Dipole_modified")
+oDesign = oProject.SetActiveDesign("without_balun")
+oModule = oDesign.GetModule("ReportSetup")
+oModule.UpdateReports(["S11"])
+oModule.ExportToFile("S11", "C:\Users\giannetti\Documents\HFSS-MATLAB_interface\Dev4\S11.csv")
