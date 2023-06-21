@@ -1,5 +1,5 @@
 # HFSS-MATLAB-API-without-VBA-scripts
-The repository contains the code to drive HFSS from MATLAB without the need of scripts.
+The repository contains the code to drive HFSS from MATLAB without the need of VBA scripts.
 
 File desciption:
 - Dipole_base.aedt, Model to simulate;
