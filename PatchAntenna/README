@@ -1,0 +1,9 @@
+File desciption:
+- Base.aedt, Model to simulate;
+- Base.txt, Model with signposts substituting the variables to be varied;
+- HFSS_MATLAB_interface.m, API HFSS-MATLAB.
+
+All other files are auxiliary and are generated in the execution of the code.
+  
+To run the API, simply run either HFSS_MATLAB_interface.m or HFSS_MATLAB_interface_opt.m.
+*Please, modify the file paths for your specific case.*
