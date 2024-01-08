@@ -1,0 +1,16 @@
+Name	Value	Unit	"Evaluated Value"	Type	Description	Read-only	Hidden	Sweep
+B	60	mm	60mm	Design		false	false	true
+A	50	mm	50mm	Design		false	false	true
+ts	1.6	mm	1.6mm	Design		false	false	true
+tc	0.035	mm	0.035mm	Design		false	false	true
+Le	8	mm	8mm	Design		false	false	true
+Lm	10	mm	10mm	Design		false	false	true
+minorA	15	mm	15mm	Design		false	false	true
+W	4.9428695285245	mm	4.9428695mm	Design		false	false	true
+minorB	0.7	mm	0.7mm	Design		false	false	true
+minorC	0.5	mm	0.5mm	Design		false	false	true
+minorD	W/2-minorB-minorC		1.2714348mm	Design		false	false	true
+L	150	mm	150mm	Design		false	false	true
+lambda	150	mm	150mm	"Post Processing"		false	false	true
+P1_power_mag	1	W	1W	"Post Processing"		false	false	true
+P1_power_pha	0	deg	0deg	"Post Processing"		false	false	true
