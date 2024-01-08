@@ -62,7 +62,7 @@ lg = legend(["1", "2", "5"],Location="northwest");
 title(lg,"Power [W]")
 set(ax2,"FontSize",10)
 
-% exportgraphics(fig2,"ElectricField.pdf")
+exportgraphics(fig2,"ElectricField.pdf")
 
 %% Functions signposts
 function Var2Sub = SignpostSubstitution(filenameIN,filenameOUT,Variables)
