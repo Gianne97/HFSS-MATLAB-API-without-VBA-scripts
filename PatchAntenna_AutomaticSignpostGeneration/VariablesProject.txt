@@ -1,1 +1,0 @@
-Name	Value	Unit	"Evaluated Value"	Description	Read-only	Hidden	Sweep
