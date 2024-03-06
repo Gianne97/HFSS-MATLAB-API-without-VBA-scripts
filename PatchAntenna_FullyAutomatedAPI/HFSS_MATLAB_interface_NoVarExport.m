@@ -32,11 +32,11 @@ x(Var2Sub{:,1} == "P1_power_mag") = 9;
 x(Var2Sub{:,1} == "P1_power_pha") = 0;
 output{3}= SimHFSS_Matlab(x,PAF);
 
-% save("ResultOutput.mat", "output")
+save("ResultOutput.mat", "output")
 
 %% Figures
 
-% load("ResultOutput.mat")
+load("ResultOutput.mat")
 
 fig1 = figure;
 hold on
@@ -62,7 +62,8 @@ lg = legend(["1", "2", "5"],Location="northwest");
 title(lg,"Power [W]")
 set(ax2,"FontSize",10,"FontName","Cambria")
 
-% exportgraphics(fig2,"ElectricField.pdf")
+exportgraphics(fig1,"Sparam.pdf")
+exportgraphics(fig2,"ElectricField.pdf")
 
 %% Functions signposts
 function Var2Sub = SignpostSubstitution(filenameIN,filenameOUT)
@@ -71,15 +72,6 @@ function Var2Sub = SignpostSubstitution(filenameIN,filenameOUT)
 fid = fopen(filenameIN); % Open the file to modify
 C = textscan(fid,'%s','delimiter','\n');
 fclose(fid);
-
-% D = C;
-% load('Check.mat')
-% for idx = 1:numel(C{1,1})
-% 
-%     if prod(C{1,1}{idx} == D{1,1}{idx}) == 0
-%         warning("They are different")
-%     end
-% end
 
 idxVar = 1;
 for k=1:numel(C{1,1}) % 500 %
