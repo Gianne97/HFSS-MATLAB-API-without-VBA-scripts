@@ -13,57 +13,45 @@ PAF.SignpostList = Var2Sub{:,4};
 x = Var2Sub{:,2};
 
 % Optimum values
-x(Var2Sub{:,1} == "B") = 59.225;
-x(Var2Sub{:,1} == "A") = 44.472;
-x(Var2Sub{:,1} == "W") = 4.943;
-x(Var2Sub{:,1} == "minorA") = 28.440;
-x(Var2Sub{:,1} == "minorB") = 2.014;
-x(Var2Sub{:,1} == "minorC") = 1.999;
+x(Var2Sub{:,1} == "a") = 50;
 
-x(Var2Sub{:,1} == "P1_power_mag") = 3;
-x(Var2Sub{:,1} == "P1_power_pha") = 0;
-output{1}= SimHFSS_Matlab(x,PAF);
+Vars = ["hv", "h_h1", "h_h2"];
+minValues = [12,  6,  6];
+maxValues = [32, 16, 16];
+NomValues = [12, 11, 11];
 
-x(Var2Sub{:,1} == "P1_power_mag") = 6;
-x(Var2Sub{:,1} == "P1_power_pha") = 0;
-output{2}= SimHFSS_Matlab(x,PAF);
+n = 15; % Number of experiments
+p = length(Vars);
+rng default % For reproducibility
+X = lhsdesign(n,p);
 
-x(Var2Sub{:,1} == "P1_power_mag") = 9;
-x(Var2Sub{:,1} == "P1_power_pha") = 0;
-output{3}= SimHFSS_Matlab(x,PAF);
+output = cell(n,1);
+unitGd = cell(n,1);
+for idx1 = 1:n
+    for idx2 = 1:p
+        x(Var2Sub{:,1} == Vars(idx2)) = minValues(idx2) + X(idx1, idx2)*(maxValues(idx2) - minValues(idx2));
+    end
 
-save("ResultOutput.mat", "output")
+    disp(idx1)
 
-%% Figures
-
-load("ResultOutput.mat")
-
-fig1 = figure;
-hold on
-plot(output{1}{1}{:,1},output{1}{1}{:,2})
-plot(output{1}{2}{:,1},output{1}{2}{:,2})
-hold off
-
-fig2 = figure;
-ax2 = axes(fig2);
-ax2.Units = "centimeters";
-ax2.Position(3:4) = [7,5];
-hold on
-for idx = 1:numel(output)
-    plot(output{idx}{3}{:,2},output{idx}{3}{:,3})
+    output{idx1}= SimHFSS_Matlab(x,PAF);
+    unitGd{idx1} = importfile("C:\Users\giannetti\Documents\CavityFilter\DualBand\API_MATLAB\Gd.csv", [1, 1]);
 end
-hold off
-box("on")
-grid("on")
-% xlabel("Normalized position")
-xlabel("Normalized position = y/(L_m + a + L + L_e)") % , "Interpreter","tex")
-ylabel("Electric field magnitude (V/m)")
-lg = legend(["1", "2", "5"],Location="northwest");
-title(lg,"Power [W]")
-set(ax2,"FontSize",10,"FontName","Cambria")
 
-exportgraphics(fig1,"Sparam.pdf")
-exportgraphics(fig2,"ElectricField.pdf")
+InputVoltage = [1, 10, 100];
+outputNom = cell(numel(InputVoltage),1);
+unitGdNom = cell(numel(InputVoltage),1);
+for idx2 = 1:p
+    x(Var2Sub{:,1} == Vars(idx2)) = NomValues(idx2);
+end
+
+for idx1 = 1:numel(InputVoltage)
+    x(Var2Sub{:,1} == "Pmag") = InputVoltage(idx1);
+    outputNom{idx1} = SimHFSS_Matlab(x,PAF);
+    unitGdNom{idx1} = importfile("C:\Users\giannetti\Documents\CavityFilter\DualBand\API_MATLAB\Gd.csv", [1, 1]);
+end
+
+save("ResultOutput.mat", "output", "unitGd", "Vars", "minValues", "maxValues", "X", "NomValues", "outputNom", "unitGdNom")
 
 %% Functions signposts
 function Var2Sub = SignpostSubstitution(filenameIN,filenameOUT)
@@ -76,7 +64,6 @@ fclose(fid);
 idxVar = 1;
 for k=1:numel(C{1,1}) % 500 %
     % Find the values to substitute
-
     if contains(C{1,1}(k),"VariableProp")
         Variables(idxVar, 1) = extractBetween(C{1,1}(k),"VariableProp('","', '");
         helpC = C{1,1}(k);
@@ -97,10 +84,13 @@ Unit = cell(Nvar,1);
 for idx = 1:Nvar
     help1 = isstrprop(Variables{idx,2},'digit');
     help2 = isstrprop(Variables{idx,2},'punct');
+    help2(strfind( Variables{idx,2},"_")) = false;
     idxx = or(help1, help2);
 
     Value(idx) = str2double(Variables{idx,2}(idxx));
-    Unit{idx} = Variables{idx,2}(isstrprop(Variables{idx,2},'alpha'));
+    help3 = isstrprop(Variables{idx,2},'alpha');
+    help3(strfind( Variables{idx,2},"_")) = true;
+    Unit{idx} = Variables{idx,2}(help3);
     if isempty(Unit{idx})
         Unit{idx} = '<undefined>';
     end
@@ -119,7 +109,7 @@ C = textscan(fid,'%s','delimiter','\n');
 fclose(fid);
 
 % Update the variables
-for k=1:numel(C{1,1}) % 500 % 
+for k=1:numel(C{1,1})
     % Find the values to substitute
 
     if contains(C{1,1}(k),"VariableProp")
@@ -127,7 +117,6 @@ for k=1:numel(C{1,1}) % 500 %
             ActualVar = extractBetween(C{1,1}(k),"VariableProp('","', '");
             if strcmp(ActualVar, Var2Sub{idx,1})
                 % C{1,1}(k) % Before substitution
-
                 helpC = C{1,1}(k);
                 if helpC{1}(end-1:end) == "))"
                     help = extractBetween(C{1,1}(k),"', '","', oa(");
@@ -227,13 +216,13 @@ end
 
 function PAF = PathAndFile
 % Paths to change
-PAF.mainPath = "C:\Users\giannetti\Documents\HFSS-MATLAB_interface\Dev7\MatlabNoVarExport\";
+PAF.mainPath = "C:\Users\giannetti\Documents\CavityFilter\DualBand\API_MATLAB\Example\";
 PAF.HFSSpath = "C:\""Program Files\AnsysEM\v241\Win64\ansysedt.exe""";
 PAF.HFSSfile_filename = "Modified.aedt";
 PAF.model_name = "Design";
 PAF.HFSSscript_filename = "ExportToFile_Sparam.py";
-PAF.HFSSoutput_filename = ["S11mag", "S11pha", "NearE"];
-PAF.HFSSoutput_notes = ["", "", ", False"];
+PAF.HFSSoutput_filename = ["S11mag", "S11pha", "Gd", "Emag_low_L1", "Emag_high_L1", "Emag_low_L2", "Emag_high_L2"];
+PAF.HFSSoutput_notes = ["", "", "", ", False", ", False", ", False", ", False"]; % , ", False"
 % PAF.filenameINstart_filename  = "BaseNoSignposts.txt";
 PAF.filenameINstart_filename  = "Base.aedt";
 PAF.filenameIN_filename  = "Base.txt";
